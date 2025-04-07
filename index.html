@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Volleyball Videoanalyse</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    tr:hover { background-color: #f9f9f9; }
+  </style>
+</head>
+<body>
+  <h1>🎥 Volleyball Highlight-Analyse</h1>
+
+  <video id="video" width="640" controls>
+    <source src="highlight_output.mp4" type="video/mp4">
+    Dein Browser unterstützt kein HTML5-Video.
+  </video>
+
+  <h2>🧠 Aktionen</h2>
+  <input type="file" id="csvFile" accept=".csv" />
+
+  <table id="actionTable">
+    <thead>
+      <tr>
+        <th>Frame</th>
+        <th>Sekunde</th>
+        <th>Aktion</th>
+        <th>Springe zu</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const video = document.getElementById('video');
+    const tableBody = document.querySelector('#actionTable tbody');
+
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          tableBody.innerHTML = '';
+          results.data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row.Frame}</td>
+              <td>${row.Sekunde}</td>
+              <td>${row.Aktion}</td>
+              <td><button onclick="video.currentTime = ${Math.floor(row.Sekunde)}; video.play();">▶️</button></td>
+            `;
+            tableBody.appendChild(tr);
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
